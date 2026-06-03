@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://screen-rpa.local/schemas/workflow-runtime.json",
+  "title": "WorkflowRuntime",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workflow_id", "name", "settings", "nodes", "edges"],
+  "properties": {
+    "workflow_id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string" },
+    "version": { "type": "integer", "minimum": 0 },
+    "meta": { "type": "object" },
+    "input_schema": { "type": "object" },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_timeout_sec", "max_retries", "max_loop_iterations"],
+      "properties": {
+        "default_timeout_sec": { "type": "integer", "minimum": 0 },
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "max_loop_iterations": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/runtimeNode" }
+    },
+    "edges": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/runtimeEdge" }
+    }
+  },
+  "$defs": {
+    "conditionObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "none",
+            "expression",
+            "image_exists",
+            "image_not_exists",
+            "window_active",
+            "clipboard_changed",
+            "sub_image_exists",
+            "sub_image_not_exists"
+          ]
+        },
+        "params": { "type": "object" }
+      }
+    },
+    "retryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_retries", "interval_ms", "backoff"],
+      "properties": {
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "interval_ms": { "type": "integer", "minimum": 0 },
+        "backoff": { "type": "string", "enum": ["fixed", "exponential"] }
+      }
+    },
+    "runtimeNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "name", "config"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "enum": [
+            "start",
+            "end",
+            "action",
+            "wait",
+            "if",
+            "subflow",
+            "lowcode_function",
+            "loop-container",
+            "loop_start",
+            "continue",
+            "break"
+          ]
+        },
+        "name": { "type": "string" },
+        "config": { "type": "object" },
+        "timeout_sec": { "type": "integer", "minimum": 0 },
+        "on_error": {
+          "type": "string",
+          "enum": ["fail", "retry", "skip", "to_node"]
+        },
+        "retry_policy": { "$ref": "#/$defs/retryPolicy" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": { "const": "lowcode_function" }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "config": { "$ref": "#/$defs/lowcodeFunctionConfig" }
+            },
+            "required": ["config"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": { "const": "continue" }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "config": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "sleep_ms": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "required": ["config"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": { "const": "loop-container" }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "properties": {
+              "config": { "$ref": "#/$defs/loopContainerConfig" }
+            },
+            "required": ["config"]
+          }
+        }
+      ]
+    },
+    "loopContainerConfig": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["maxIterations", "loopId", "subGraph"],
+      "properties": {
+        "maxIterations": { "type": "integer", "minimum": 1 },
+        "loopId": { "type": "string", "minLength": 1 },
+        "subGraph": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nodes", "edges"],
+          "properties": {
+            "nodes": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/runtimeNode" }
+            },
+            "edges": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/runtimeEdge" }
+            }
+          }
+        }
+      }
+    },
+    "lowcodeFunctionConfig": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["code_body"],
+      "properties": {
+        "code_body": { "type": "string", "minLength": 1, "maxLength": 20480 },
+        "timeout_ms": { "type": "integer", "minimum": 0 },
+        "retry_times": { "type": "integer", "minimum": 0 },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "runtimeEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "condition": { "$ref": "#/$defs/conditionObject" }
+      }
+    }
+  }
+}

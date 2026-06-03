@@ -1,0 +1,32 @@
+{
+  "workflow_id": "wf_minimal_demo",
+  "name": "最小可执行示例",
+  "version": 1,
+  "meta": { "description": "contract golden sample" },
+  "input_schema": {
+    "type": "object",
+    "required": ["order_id"],
+    "properties": {
+      "order_id": { "type": "string" }
+    }
+  },
+  "settings": {
+    "default_timeout_sec": 60,
+    "max_retries": 0,
+    "max_loop_iterations": 1000
+  },
+  "nodes": [
+    { "id": "start_1", "type": "start", "name": "开始", "config": {} },
+    {
+      "id": "wait_1",
+      "type": "wait",
+      "name": "占位等待",
+      "config": { "condition": { "kind": "none", "params": {} }, "timeout_ms": 50, "poll_interval_ms": 10 }
+    },
+    { "id": "end_1", "type": "end", "name": "结束", "config": {} }
+  ],
+  "edges": [
+    { "from": "start_1", "to": "wait_1" },
+    { "from": "wait_1", "to": "end_1" }
+  ]
+}
