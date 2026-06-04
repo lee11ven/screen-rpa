@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { computed, defineComponent, h, resolveComponent, type PropType, type VNode } from 'vue'
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { routes } from '../router'
+
+const MENU_ROUTE_NAMES = new Set([
+  'workflow-list',
+  'workflow-global-config',
+  'workflow-queue-list',
+  'workflow-system-config',
+])
 
 type MenuRoute = RouteRecordRaw & { children?: MenuRoute[] }
 
@@ -29,6 +36,25 @@ const buildMenuTree = (items: MenuRoute[], basePath = ''): MenuRoute[] =>
 
 const menuTree = computed(() => buildMenuTree(routes as MenuRoute[]))
 const route = useRoute()
+const router = useRouter()
+
+const activeMenu = computed(() => {
+  const name = route.name
+  if (typeof name === 'string' && MENU_ROUTE_NAMES.has(name)) {
+    return name
+  }
+  return typeof name === 'string' ? name : route.path
+})
+
+function onMenuSelect(index: string) {
+  if (index.startsWith('submenu:')) return
+  if (index.includes('/')) {
+    void router.push(index)
+    return
+  }
+  void router.push({ name: index })
+}
+
 const breadcrumbItems = computed(() =>
   route.matched
     .filter((item) => Boolean(item.meta?.title))
@@ -72,10 +98,11 @@ const MenuTree = defineComponent({
         return h('span', { class: 'menu-title' }, titleChildren)
       }
       const hasChildren = Boolean(item.children?.length)
+      const menuKey = String(item.name ?? item.path)
       if (hasChildren) {
         return h(
           ElSubMenu,
-          { index: item.path },
+          { index: `submenu:${menuKey}` },
           {
             title,
             default: () => item.children!.map((child) => renderMenu(child)),
@@ -84,7 +111,10 @@ const MenuTree = defineComponent({
       }
       return h(
         ElMenuItem,
-        { index: item.path },
+        {
+          index: menuKey,
+          route: item.name ? { name: item.name as string } : menuKey,
+        },
         {
           default: title,
         },
@@ -100,7 +130,7 @@ const MenuTree = defineComponent({
   <el-container class="layout-root">
     <el-aside width="220px" class="aside">
       <div class="brand">Screen RPA</div>
-      <el-menu router :default-active="$route.path" class="menu">
+      <el-menu router :default-active="activeMenu" class="menu" @select="onMenuSelect">
         <MenuTree :items="menuTree" />
       </el-menu>
     </el-aside>

@@ -23,6 +23,26 @@ export const routes = [
         },
       },
       {
+        path: 'global-config',
+        name: 'workflow-global-config',
+        component: () => import('@/modules/workflow/pages/GlobalObjectConfigPage.vue'),
+        meta: {
+          title: '全局对象配置',
+          isMenu: true,
+          icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        },
+      },
+      {
+        path: 'queue',
+        name: 'workflow-queue-list',
+        component: () => import('@/modules/workflow/pages/QueueListPage.vue'),
+        meta: {
+          title: '执行队列列表',
+          isMenu: true,
+          icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="10" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="15" width="10" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>',
+        },
+      },
+      {
         path: ':id/editor',
         name: 'workflow-editor',
         component: () => import('@/modules/workflow/pages/WorkflowEditorPage.vue'),
@@ -52,26 +72,6 @@ export const routes = [
           isMenu: false,
         },
       },
-      {
-        path: 'global-config',
-        name: 'workflow-global-config',
-        component: () => import('@/modules/workflow/pages/GlobalObjectConfigPage.vue'),
-        meta: {
-          title: '全局对象配置',
-          isMenu: true,
-          icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-        },
-      },
-      {
-        path: 'queue',
-        name: 'workflow-queue-list',
-        component: () => import('@/modules/workflow/pages/QueueListPage.vue'),
-        meta: {
-          title: '执行队列列表',
-          isMenu: true,
-          icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="10" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="4" y="15" width="10" height="4" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>',
-        },
-      },
     ],
   },
   {
@@ -81,7 +81,7 @@ export const routes = [
     meta: {
       title: '系统配置',
       isMenu: true,
-      icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.4 1.4 2.8-.3.8 2.7 2.3 1.6-1.1 2.6 1.1 2.6-2.3 1.6-.8 2.7-2.8-.3L12 21l-2.4-1.4-2.8.3-.8-2.7-2.3-1.6 1.1-2.6-1.1-2.6 2.3-1.6.8-2.7 2.8.3L12 3z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5L14.87 5.07L18.72 5.28L18.93 9.13L21.5 12L18.93 14.87L18.72 18.72L14.87 18.93L12 21.5L9.13 18.93L5.28 18.72L5.07 14.87L2.5 12L5.07 9.13L5.28 5.28L9.13 5.07Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>',
     },
   }
 ]
